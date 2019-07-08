@@ -19,7 +19,7 @@ train_loader = DataLoader(train_ds, batch_size=32)
 test_ds = TensorDataset(torch.tensor(x_test).float(), torch.tensor(y_test).long())
 test_loader = DataLoader(test_ds, batch_size=32)
 
-model = MuVANminus(64, 1856)
+model = MuVANminus(64, 1856, 23)
 loss_func = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), weight_decay=0.0001)
 
@@ -70,9 +70,9 @@ def eval(load=True):
 
 
 def main():
-    train()
-    eval()
-    torch.save(model.state_dict(), "minus.pth")
+    train(False)
+    eval(False)
+    torch.save(model.state_dict(), "minus2.pth")
 
 
 if __name__ == '__main__':
