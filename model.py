@@ -78,11 +78,13 @@ class Net(nn.Module):
 
 
 class MuVANminus(nn.Module):
-    def __init__(self, h_size, fc_in):
+    def __init__(self, h_size, fc_in, n_featreus):
         super(MuVANminus, self).__init__()
         self.fc_in = fc_in
 
-        self.bgru = nn.GRU(1, h_size, batch_first=True, bidirectional=True, num_layers=2)
+        self.rnn = nn.ModuleList([
+            nn.GRU(1, h_size, batch_first=True, bidirectional=True, num_layers=2) for _ in range(n_featreus)
+        ])
         self.conv = nn.Sequential(
             nn.Conv2d(256, 16, 5),
             nn.ReLU(),
@@ -95,9 +97,10 @@ class MuVANminus(nn.Module):
 
     def forward(self, x):
         arry = []
-        for v in range(x.shape[2]):
-            tmp = x[:, :, v].unsqueeze(2)
-            o, _ = self.bgru(tmp)
+
+        for i, l in enumerate(self.rnn):
+            tmp = x[:, :, i].unsqueeze(2)
+            o, _ = l(tmp)
             arry.append(o)
 
         arry = torch.stack(arry, 3)
